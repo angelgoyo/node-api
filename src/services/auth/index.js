@@ -32,12 +32,12 @@ export const loginRouteHandler = async (req, res, email, password) => {
         { id: foundUser.id, email: foundUser.email },
         process.env.JWT_SECRET,
         {
-          expiresIn: "24h",
+          expiresIn: process.env.JWT_TOKEN_EXPIRATION,
         }
       );
       return res.json({
         token_type: "Bearer",
-        expires_in: "24h",
+        expires_in: process.env.JWT_TOKEN_EXPIRATION,
         access_token: token,
         refresh_token: token,
       });
@@ -47,48 +47,6 @@ export const loginRouteHandler = async (req, res, email, password) => {
       });
     }
   }
-};
-
-export const registerRouteHandler = async (req, res, name, email, password) => {
-  // check if user already exists
-  let foundUser = await userModel.findOne({ email: email });
-  if (foundUser) {
-    // does not get the error
-    return res.status(400).json({ message: "Email is already in use" });
-  }
-
-  // check password to exist and be at least 8 characters long
-  if (!password || password.length < 8) {
-    return res
-      .status(400)
-      .json({ message: "Password must be at least 8 characters long." });
-  }
-
-  // hash password to save in db
-  const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(password, salt);
-
-  const newUser = new userModel({
-    name: name,
-    email: email,
-    password: hashPassword,
-  });
-  await newUser.save();
-
-  // Generate JWT token
-  const token = jwt.sign(
-    { id: newUser.id, email: newUser.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "24h",
-    }
-  );
-  return res.status(200).json({
-    token_type: "Bearer",
-    expires_in: "24h",
-    access_token: token,
-    refresh_token: token,
-  });
 };
 
 export const forgotPasswordRouteHandler = async (req, res, email) => {
@@ -101,7 +59,7 @@ export const forgotPasswordRouteHandler = async (req, res, email) => {
   } else {
     let token = randomToken(20);
     // send mail with defined transport object
-    let info = await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: "admin@jsonapi.com", // sender address
       to: email, // list of receivers
       subject: "Reset Password", // Subject line

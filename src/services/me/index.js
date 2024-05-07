@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { userModel } from "../../schemas/user.schema.js";
-import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -19,6 +18,7 @@ export const getProfileRouteHandler = (req, res) => {
       attributes: {
         name: meUser.name,
         email: meUser.email,
+        rol: meUser.rol,
         profile_image: null,
         createdAt: meUser.createdAt,
         updateAt: meUser.updateAt,

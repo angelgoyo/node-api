@@ -1,29 +1,24 @@
 import express from "express";
-import passport from "passport";
-import jwt from "jsonwebtoken";
-
-const router = express.Router();
 import {
   getProfileRouteHandler,
   patchProfileRouteHandler,
 } from "../../services/me/index.js";
 
+const router = express.Router();
 // get user's profile
-router.get(
-  "/",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    getProfileRouteHandler(req, res);
-  }
-);
+router.get("/", (req, res) => {
+  /* 	#swagger.tags = ['Me']
+      #swagger.description = 'Endpoint to get a specific user profile' 
+  */
+  getProfileRouteHandler(req, res);
+});
 
 // update user's profile
-router.patch(
-  "/",
-  passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
-    patchProfileRouteHandler(req, res);
-  }
-);
+router.patch("/", async (req, res) => {
+  /* 	#swagger.tags = ['Me']
+      #swagger.description = 'Endpoint to update a specific user profile' 
+  */
+  patchProfileRouteHandler(req, res);
+});
 
 export default router;

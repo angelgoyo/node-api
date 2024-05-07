@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { userModel } from "../schemas/user.schema.js";
-import { dbConnect } from "../mongo/index.js";
+import { dbConnect } from "./index.js";
 
 async function seedDB() {
   dbConnect();
   const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash("secret", salt);
+  const hashPassword = await bcrypt.hash(process.env.JWT_SECRET, salt);
 
   const user = {
     _id: mongoose.Types.ObjectId(1),

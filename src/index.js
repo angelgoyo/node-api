@@ -1,14 +1,16 @@
+import swaggerUi from "swagger-ui-express";
+import swaggerFile from "./swagger-output.json" assert { type: "json" };
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import "./passport.js";
-import { dbConnect } from "./mongo/index.js";
-import { meRoutes, authRoutes } from "./routes/index.js";
+import "./middleware/passport.middleware.js";
+import { dbConnect } from "./database/index.js";
+import router from "./routes/routes.js";
 import path from "path";
 import * as fs from "fs";
 import cron from "node-cron";
-import ReseedAction from "./mongo/ReseedAction.js";
+import ReseedAction from "./database/ReseedAction.js";
 
 dotenv.config();
 
@@ -37,8 +39,9 @@ app.get("/", function (req, res) {
   res.sendFile(path.join(__dirname, "/src/landing/index.html"));
 });
 
-app.use("/", authRoutes);
-app.use("/me", meRoutes);
+app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+app.use(router);
 
 if (process.env.SCHEDULE_HOUR) {
   cron.schedule(`0 */${process.env.SCHEDULE_HOUR} * * *'`, () => {
